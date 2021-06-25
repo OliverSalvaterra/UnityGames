@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 public enum cubeState
-    {
-        off,
-        on
-    };
+{
+    off,
+    on
+};
 public class CubeClass
 {
     public GameObject cube;
@@ -44,7 +41,7 @@ public class CubeClass
             if (pos.Item1 > 0)
             {
                 if (grid[pos.Item1 - 1, pos.Item2 - 1, pos.Item3].state == cubeState.on) neighbors++;   // topleft neighbor
-            }  
+            }
             if (pos.Item1 < grid.GetLength(0) - 1)
             {
                 if (grid[pos.Item1 + 1, pos.Item2 - 1, pos.Item3].state == cubeState.on) neighbors++; // bottom left neighbor
@@ -73,22 +70,64 @@ public class CubeClass
         }
         if (pos.Item3 > 0)
         {
-            if (grid[pos.Item1, pos.Item2, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            if (grid[pos.Item1, pos.Item2, pos.Item3 - 1].state == cubeState.on) neighbors++; // up neighbor
+            if (pos.Item1 > 0)
+            {
+                if (grid[pos.Item1 - 1, pos.Item2, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            }
+            if (pos.Item1 < grid.GetLength(0) - 1)
+            {
+                if (grid[pos.Item1 + 1, pos.Item2, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            }
+            if (pos.Item2 > 0)
+            {
+                if (grid[pos.Item1, pos.Item2 - 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            }
+            if (pos.Item2 < grid.GetLength(0) - 1)
+            {
+                if (grid[pos.Item1, pos.Item2 + 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            }
+            //if (grid[pos.Item1 - 1, pos.Item2 - 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 + 1, pos.Item2 - 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 - 1, pos.Item2 + 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 + 1, pos.Item2 + 1, pos.Item3 - 1].state == cubeState.on) neighbors++;
         }
         if (pos.Item3 < grid.GetLength(2) - 1)
         {
-            if (grid[pos.Item1, pos.Item2, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            if (grid[pos.Item1, pos.Item2, pos.Item3 + 1].state == cubeState.on) neighbors++; // down neighbor
+            if(pos.Item1 > 0)
+            {
+                if (grid[pos.Item1 - 1, pos.Item2, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            }
+            if(pos.Item1 < grid.GetLength(0) - 1)
+            {
+                if (grid[pos.Item1 + 1, pos.Item2, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            }
+            if(pos.Item2 > 0)
+            {
+                if (grid[pos.Item1, pos.Item2 - 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            }
+            if(pos.Item2 < grid.GetLength(0) - 1)
+            {
+                if (grid[pos.Item1, pos.Item2 + 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            }
+            
+            
+            //if (grid[pos.Item1 - 1, pos.Item2 - 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 + 1, pos.Item2 - 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 - 1, pos.Item2 + 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
+            //if (grid[pos.Item1 + 1, pos.Item2 + 1, pos.Item3 + 1].state == cubeState.on) neighbors++;
         }
     }
 
     public void update()
     {
-        if (neighbors == 3 && state == cubeState.off)
+        if (neighbors == 3 && state == cubeState.off) // if == 3 normally
         {
             state = cubeState.on;
             transparency();
         }
-        else if ((neighbors < 2 || neighbors > 3) && state == cubeState.on)
+        else if ((neighbors < 2 || neighbors > 3) && state == cubeState.on) // outside of 2 and 3 normally
         {
             state = cubeState.off;
             transparency();
@@ -111,7 +150,7 @@ public class CubeClass
             renderer.enabled = true;
             transparent = true;
         }
-        else if(state == cubeState.off)
+        else if (state == cubeState.off)
         {
             //var material = cube.GetComponent<Renderer>().material;
             //material.color = new Color(material.color.r, material.color.g, material.color.b, 0.0f);
@@ -125,8 +164,9 @@ public class CubeClass
 public class boxGrid : MonoBehaviour
 {
     public GameObject cubeTemplate;
-    public CubeClass[,,] grid = new CubeClass[40, 40, 40];
+    public CubeClass[,,] grid = new CubeClass[50, 50, 50];
     GameObject empty;
+    public GameObject ind;
 
     float currTime = 0;
     bool pause;
@@ -145,12 +185,11 @@ public class boxGrid : MonoBehaviour
 
         for (int i = 0; i < grid.GetLength(0); i++)
         {
-            for(int j = 0; j < grid.GetLength(1); j++)
+            for (int j = 0; j < grid.GetLength(1); j++)
             {
                 for (int z = 0; z < grid.GetLength(2); z++)
                 {
-                    
-                    grid[i, j, z] = new CubeClass(Instantiate(cubeTemplate, new Vector3(i * size.x + (i/2f), z*size.z + (z/2f), j * size.z + (j/2f)), Quaternion.identity), i, j, z, (cubeState)Random.Range(0, 2));
+                    grid[i, j, z] = new CubeClass(Instantiate(cubeTemplate, new Vector3(i * size.x + (i / 2f), z * size.z + (z / 2f), j * size.z + (j / 2f)), Quaternion.identity), i, j, z, cubeState.off); // (cubeState)Random.Range(0, 2) for random seeds
                 }
             }
         }
@@ -168,7 +207,7 @@ public class boxGrid : MonoBehaviour
         if (!pause)
         {
             currTime += Time.deltaTime;
-            if (currTime >= .11f)
+            if (currTime >= .25f)
             {
                 for (int i = 0; i < grid.GetLength(0); i++)
                 {
@@ -195,9 +234,7 @@ public class boxGrid : MonoBehaviour
             }
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitinfo);
+        bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hitinfo);
 
             if (hit)
             {
@@ -209,14 +246,18 @@ public class boxGrid : MonoBehaviour
                         {
                             if (hitinfo.transform.gameObject == grid[i, j, z].cube)
                             {
-                                grid[i, j, z].flip();
-                                goto aferLoop;
+                                ind.transform.position = grid[i, j, z].cube.transform.position;
+
+                                if (Input.GetMouseButtonDown(0))
+                                {
+                                    grid[i, j, z].flip();
+                                    goto aferLoop;
+                                }
                             }
                         }
                     }
                 }
             aferLoop:;
             }
-        }
     }
 }
