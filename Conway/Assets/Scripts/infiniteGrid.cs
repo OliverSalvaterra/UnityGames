@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class infiniteGrid : MonoBehaviour
 {
-    Dictionary<Vector3, GameObject> cubes = new Dictionary<Vector3, GameObject>();
+    public Dictionary<Vector3, GameObject> cubes = new Dictionary<Vector3, GameObject>();
+    public Dictionary<Vector3, int> neighbors = new Dictionary<Vector3, int>();
     bool pause = false;
     float currTime = 0;
     int cubeside = 2;
@@ -14,50 +15,86 @@ public class infiniteGrid : MonoBehaviour
     public GameObject ind;
     public GameObject plane;
 
-    public void create(Vector3 pos, Dictionary<Vector3, GameObject> cubes)
+    public void create(Vector3 pos)
     {
-        GameObject cube = Instantiate(cubeTemplate, pos, Quaternion.identity);
-        cubes.Add(pos, cube);
+        if (!neighbors.ContainsKey(pos)) neighbors.Add(pos, 0);
+        
+        if (!cubes.ContainsKey(pos))
+        {
+            updateCubes(pos, true);
+            GameObject cube = Instantiate(cubeTemplate, pos, Quaternion.identity);
+            cubes.Add(pos, cube);
+        }
     }
-    public void destroy(Vector3 pos, Dictionary<Vector3, GameObject> cubes)
+    public void destroy(Vector3 pos)
     {
+        updateCubes(pos, false);
         cubes.TryGetValue(pos, out GameObject cube);
-        Destroy(cube);
         cubes.Remove(pos);
+        Destroy(cube);
     }
 
-    public int neighbors(Dictionary<Vector3, GameObject> cubes, Vector3 pos)
+    public void updateNeighbors(Vector3 pos, bool cd)
     {
-        int rtrn = 0;
+        if (cd)
+        {
+            if (!neighbors.ContainsKey(pos))
+            {
+                neighbors.Add(pos, 1);
+            }
+            else
+            {
+                neighbors[pos]++;
+            }
+        }
+        else
+        {
+            //if(neighbors[pos] == 1)
+            //{
+                //neighbors.Remove(pos);
+            //}
+           // else
+            //{
+                neighbors[pos]--;
+           // }
+        }
+    }
 
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y - cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y - cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y + cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y + cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y - cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y + cubeside, pos.z))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y - cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y + cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y - cubeside, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y + cubeside, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x, pos.y, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y - cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y - cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y + cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y - cubeside, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y + cubeside, pos.z - cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y - cubeside, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x - cubeside, pos.y + cubeside, pos.z + cubeside))) rtrn++;
-        if (cubes.ContainsKey(new Vector3(pos.x + cubeside, pos.y + cubeside, pos.z + cubeside))) rtrn++;
+    public void updateStates()
+    {
+        List<(Vector3, bool)> cd = new List<(Vector3, bool)>();
+        bool contains = false;
+        int n = 0;
 
-        return rtrn;
+        foreach(Vector3 pos in neighbors.Keys) 
+        {
+            contains = cubes.ContainsKey(pos);
+            n = neighbors[pos];
+
+            if (!contains && n == 3) cd.Add((pos, true));
+            else if (contains && (n > 3 || n < 2)) cd.Add((pos, false));
+        }
+
+        for(int i = 0; i < cd.Count; i++)
+        {
+            if (cd[i].Item2 == true) create(cd[i].Item1);
+            else destroy(cd[i].Item1);
+        }
+    }
+
+    public void updateCubes(Vector3 pos, bool cd)
+    {
+            for(int x = -1; x <= 1; x++)
+            {
+                for(int y = -1; y <= 1; y++)
+                {
+                    for(int z = -1; z <= 1; z++)
+                    {
+                        if (x == 0 && y == 0 && z == 0) continue;
+                        updateNeighbors(new Vector3(pos.x + x*cubeside, pos.y + y*cubeside, pos.z + z*cubeside), cd);
+                    }
+                }
+            }
     }
 
     // Start is called before the first frame update
@@ -80,9 +117,10 @@ public class infiniteGrid : MonoBehaviour
         if (!pause)
         {
             currTime += Time.deltaTime;
-            if (currTime >= .25f)
+            if (currTime >= .40f)
             {
-                
+                updateStates();
+
                 currTime = 0;
             }
         }
@@ -93,7 +131,7 @@ public class infiniteGrid : MonoBehaviour
         {
             if (hitinfo.collider.gameObject == plane)
             {
-                pos = new Vector3((int)(hitinfo.collider.transform.position.x/cubeside), (int)(hitinfo.collider.transform.position.y / cubeside), (int)(hitinfo.collider.transform.position.z / cubeside));
+                pos = new Vector3(((int)(hitinfo.point.x / cubeside)) * cubeside, ((int)(hitinfo.point.y / cubeside)) * cubeside, ((int)(hitinfo.point.z / cubeside)) * cubeside);
             }
             else
             {
@@ -107,11 +145,11 @@ public class infiniteGrid : MonoBehaviour
             {
                 if (cd)
                 {
-                    create(pos, cubes);
+                    create(pos);
                 }
                 else
                 {
-                    destroy(pos, cubes);
+                    destroy(pos);
                 }
             }
         }

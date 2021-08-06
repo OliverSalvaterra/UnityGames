@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
 {
+
+    public GameObject plane;
+    public int cubeSide = 2;
+    public bool uClicked = false;
+    public bool dClicked = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -14,6 +20,25 @@ public class CameraMovement : MonoBehaviour
     void Update()
     {
         Camera.main.transform.position += transform.forward * Input.mouseScrollDelta.y * 5;
+
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+            uClicked = true;
+        }
+        if (Input.GetKeyUp(KeyCode.W) && uClicked)
+        {
+            plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y + cubeSide, plane.transform.position.z);
+            uClicked = false;
+        }
+        if (Input.GetKeyDown(KeyCode.S))
+        {
+            dClicked = true;
+        }
+        if (Input.GetKeyUp(KeyCode.S) && dClicked)
+        {
+            plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y - cubeSide, plane.transform.position.z);
+            dClicked = false;
+        }
 
         if (Input.GetKey(KeyCode.UpArrow))
         {
