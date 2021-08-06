@@ -14,6 +14,10 @@ public class infiniteGrid : MonoBehaviour
     GameObject empty;
     public GameObject ind;
     public GameObject plane;
+    public int creationUpperBounds;
+    public int creationLowerBounds;
+    public int destroyUpperBounds;
+    public int destroyLowerBounds;
 
     public void create(Vector3 pos)
     {
@@ -71,8 +75,8 @@ public class infiniteGrid : MonoBehaviour
             contains = cubes.ContainsKey(pos);
             n = neighbors[pos];
 
-            if (!contains && n == 3) cd.Add((pos, true));
-            else if (contains && (n > 3 || n < 2)) cd.Add((pos, false));
+            if (!contains && (n <= creationUpperBounds && n >= creationLowerBounds)) cd.Add((pos, true));
+            else if (contains && (n > destroyUpperBounds || n < destroyLowerBounds)) cd.Add((pos, false));
         }
 
         for(int i = 0; i < cd.Count; i++)
@@ -113,6 +117,16 @@ public class infiniteGrid : MonoBehaviour
         {
             pause = !pause;
         }
+
+        /*if (Input.GetKeyDown(KeyCode.R))
+        {
+            foreach(Vector3 position in cubes.Keys)
+            {
+                destroy(position);
+                cubes.Clear();
+                neighbors.Clear();
+            }
+        }*/
 
         if (!pause)
         {

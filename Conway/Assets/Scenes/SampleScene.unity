@@ -252,6 +252,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   plane: {fileID: 858987315}
   cubeSide: 2
+  uClicked: 0
+  dClicked: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -532,6 +534,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   plane: {fileID: 0}
   cubeSide: 2
+  uClicked: 0
+  dClicked: 0
 --- !u!1 &1200746093
 GameObject:
   m_ObjectHideFlags: 0
@@ -595,6 +599,10 @@ MonoBehaviour:
     type: 3}
   ind: {fileID: 411821811}
   plane: {fileID: 858987315}
+  creationUpperBounds: 4
+  creationLowerBounds: 4
+  destroyUpperBounds: 2
+  destroyLowerBounds: 2
 --- !u!1001 &1293716821
 PrefabInstance:
   m_ObjectHideFlags: 0
