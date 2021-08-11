@@ -18,7 +18,7 @@ public class infiniteGrid : MonoBehaviour
     public int creationLowerBounds;
     public int destroyUpperBounds;
     public int destroyLowerBounds;
-
+    
     public void create(Vector3 pos)
     {
         if (!neighbors.ContainsKey(pos)) neighbors.Add(pos, 0);
@@ -86,6 +86,17 @@ public class infiniteGrid : MonoBehaviour
         }
     }
 
+    public void updateColor()
+    {
+        foreach (Vector3 pos in cubes.Keys)
+        {
+            float d = Vector3.Distance(ind.transform.position, pos);
+
+            var cubeRenderer = cubes[pos].GetComponent<Renderer>();
+            cubeRenderer.material.color = Color.Lerp(Color.red, Color.cyan, Mathf.Abs(d / 100));
+        }
+    }
+
     public void updateCubes(Vector3 pos, bool cd)
     {
             for(int x = -1; x <= 1; x++)
@@ -118,15 +129,15 @@ public class infiniteGrid : MonoBehaviour
             pause = !pause;
         }
 
-        /*if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKey(KeyCode.R))
         {
             foreach(Vector3 position in cubes.Keys)
             {
-                destroy(position);
-                cubes.Clear();
-                neighbors.Clear();
+                Destroy(cubes[position]);
             }
-        }*/
+            cubes.Clear();
+            neighbors.Clear();
+        }
 
         if (!pause)
         {
@@ -134,6 +145,7 @@ public class infiniteGrid : MonoBehaviour
             if (currTime >= .40f)
             {
                 updateStates();
+                updateColor();
 
                 currTime = 0;
             }
