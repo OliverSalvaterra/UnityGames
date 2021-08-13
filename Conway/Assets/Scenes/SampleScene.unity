@@ -599,6 +599,7 @@ MonoBehaviour:
     type: 3}
   ind: {fileID: 411821811}
   plane: {fileID: 858987315}
+  center: {fileID: 685079163}
   creationUpperBounds: 4
   creationLowerBounds: 4
   destroyUpperBounds: 2

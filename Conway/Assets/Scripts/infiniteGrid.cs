@@ -14,6 +14,7 @@ public class infiniteGrid : MonoBehaviour
     GameObject empty;
     public GameObject ind;
     public GameObject plane;
+    public GameObject center;
     public int creationUpperBounds;
     public int creationLowerBounds;
     public int destroyUpperBounds;
@@ -90,7 +91,7 @@ public class infiniteGrid : MonoBehaviour
     {
         foreach (Vector3 pos in cubes.Keys)
         {
-            float d = Vector3.Distance(ind.transform.position, pos);
+            float d = Vector3.Distance(center.transform.position, pos);
 
             var cubeRenderer = cubes[pos].GetComponent<Renderer>();
             cubeRenderer.material.color = Color.Lerp(Color.red, Color.cyan, Mathf.Abs(d / 100));
